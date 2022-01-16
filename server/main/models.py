@@ -5,6 +5,10 @@ class User(models.Model):
     nickname = models.CharField(max_length=50)
     email = models.CharField(max_length=50)
 
+    def save(self, *args, **kwargs):
+        if len(User.objects.filter(google_token=self.google_token)) == 0:
+            super().save(*args, **kwargs)
+
 """=========================================================================="""
 
 class NotiBoard(models.Model):
