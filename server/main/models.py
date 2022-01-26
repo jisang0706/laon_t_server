@@ -6,7 +6,9 @@ class User(models.Model):
     email = models.CharField(max_length=50)
 
     def save(self, *args, **kwargs):
-        if len(User.objects.filter(google_token=self.google_token)) == 0:
+        if len(User.objects.filter(google_token=self.google_token)) + len(
+                User.objects.filter(nickname=self.nickname)) + len(
+                User.objects.filter(email=self.email)) == 0:
             super().save(*args, **kwargs)
 
 """=========================================================================="""

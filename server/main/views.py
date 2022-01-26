@@ -1,4 +1,5 @@
 from django.core import serializers
+from django.core.handlers.wsgi import WSGIRequest
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -20,7 +21,13 @@ class Action(View):
 class JoinUser(CreateView):
     model = User
     fields = ['google_token', 'nickname', 'email']
-    success_url = SUCCESS_URL
+
+    def get_success_url(self):
+        try:
+            User.objects.get(google_token=self.object.google_token)
+            return SUCCESS_URL
+        except:
+            return FAIL_URL
 
     def form_invalid(self, form): # 사용자 가입 실패할 경우 실패 페이지 호출
         return HttpResponseRedirect(FAIL_URL)
@@ -56,3 +63,7 @@ class NotiDetail(DetailView):
         return jsonHelper.returnJson(jsonHelper.notiToJson(
             self.get_queryset(id)
         ))
+
+class NotiCreate(CreateView):
+    model = NotiBoard
+    fields = ['']
