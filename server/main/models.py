@@ -1,7 +1,7 @@
 from django.db import models
 
 class User(models.Model):
-    google_token = models.CharField(max_length=50)
+    google_token = models.TextField()
     nickname = models.CharField(max_length=50)
     email = models.CharField(max_length=50)
 
