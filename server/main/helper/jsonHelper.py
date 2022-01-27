@@ -10,6 +10,11 @@ def actionToJson(action):
     }
     return output
 
+def userInfoToJson(action, nickname):
+    output = actionToJson(action)
+    output['nickname'] = nickname
+    return output
+
 def notiListToJson(noti_boards):
     output = {
         'meta' : {

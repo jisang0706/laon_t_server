@@ -37,10 +37,10 @@ class LoginUser(View):
 
     def post(self, request):
         try:
-            User.objects.get(google_token=request.POST['google_token'])
-            return HttpResponseRedirect(SUCCESS_URL)
+            user = User.objects.get(google_token=request.POST['google_token'])
+            return jsonHelper.returnJson(jsonHelper.userInfoToJson(True, user.nickname))
         except:
-            return HttpResponseRedirect(FAIL_URL)
+            return jsonHelper.returnJson(jsonHelper.userInfoToJson(False, ""))
 
 class NotiList(ListView):
 
