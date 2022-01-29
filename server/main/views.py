@@ -38,9 +38,9 @@ class LoginUser(View):
     def post(self, request):
         try:
             user = User.objects.get(google_token=request.POST['google_token'])
-            return jsonHelper.returnJson(jsonHelper.userInfoToJson(True, user.nickname))
+            return jsonHelper.returnJson(jsonHelper.userInfoToJson(1, user.nickname))
         except:
-            return jsonHelper.returnJson(jsonHelper.userInfoToJson(False, ""))
+            return jsonHelper.returnJson(jsonHelper.userInfoToJson(0, ""))
 
 class NotiList(ListView):
 
