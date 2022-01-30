@@ -49,8 +49,8 @@ class NotiList(ListView):
 
     def get(self, request, paginate):
         if 'base' in request.GET and request.GET['base'] == '1':
-            return jsonHelper.returnJson(jsonHelper.notiToJson(
-                NotiBoard.objects.order_by('-created_at')[0]
+            return jsonHelper.returnJson(jsonHelper.notiListToJson(
+                NotiBoard.objects.order_by('-created_at')[0:1]
             ))
 
         return jsonHelper.returnJson(jsonHelper.notiListToJson(
