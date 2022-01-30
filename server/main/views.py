@@ -48,6 +48,11 @@ class NotiList(ListView):
         return NotiBoard.objects.order_by('-created_at')[paginate*20:paginate*20+20]
 
     def get(self, request, paginate):
+        if 'base' in request.GET and request.GET['base'] == '1':
+            return jsonHelper.returnJson(jsonHelper.notiToJson(
+                NotiBoard.objects.order_by('-created_at')[0]
+            ))
+
         return jsonHelper.returnJson(jsonHelper.notiListToJson(
             self.get_queryset(paginate)
         ))

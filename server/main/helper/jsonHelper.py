@@ -34,6 +34,11 @@ def notiToJson(noti_board):
         'title' : noti_board.title,
         'created_at' : noti_board.created_at.strftime("%Y.%m.%d %H:%M"),
         'content' : noti_board.content,
-        'images' : [img.img_link for img in noti_board.images]
     }
+
+    try:
+        output['images'] = [img.img_link for img in noti_board.images]
+    except:
+        pass
+
     return output
