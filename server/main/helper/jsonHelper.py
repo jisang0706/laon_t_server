@@ -33,12 +33,12 @@ def notiToJson(noti_board):
         'id' : noti_board.id,
         'title' : noti_board.title,
         'created_at' : noti_board.created_at.strftime("%Y.%m.%d %H:%M"),
-        'content' : noti_board.content,
+        'content' : noti_board.content
     }
 
     try:
         output['images'] = [img.img_link for img in noti_board.images]
     except:
-        pass
+        output['images'] = []
 
     return output
