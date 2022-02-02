@@ -42,3 +42,82 @@ def notiToJson(noti_board):
         output['images'] = []
 
     return output
+
+def areaListToJson(area_boards):
+    output = {
+        'meta': {
+            'size': len(area_boards)
+        },
+        'list': [{
+            'id': area.id,
+            'content': area.content[:15],
+            'created_at': area.created_at.strftime("%Y.%m.%d %H:%M"),
+            'like': area.like,
+            'comment': area.comment
+        } for area in area_boards]
+    }
+    return output
+
+def areaToJson(area_board):
+    output = {
+        'id' : area_board.id,
+        'created_at' : area_board.created_at.strftime("%Y.%m.%d %H:%M"),
+        'content' : area_board.content,
+        'like' : area_board.like,
+        'comment' : area_board.comment
+    }
+
+    try:
+        output['images'] = [img.img_link for img in area_board.images]
+    except:
+        output['images'] = []
+
+    return output
+
+def areaUploadToJson(area_board):
+    if area_board == False:
+        output = {
+            'action': 0,
+            'id': 0,
+            'created_at': '0',
+            'content': '',
+            'like': 0,
+            'comment': 0
+        }
+    else:
+        output = {
+            'action': 1,
+            'id' : area_board.id,
+            'created_at' : area_board.created_at.strftime("%Y.%m.%d %H:%M"),
+            'content' : area_board.content,
+            'like' : area_board.like,
+            'comment' : area_board.comment
+        }
+    return output
+
+def countToJson(cnt):
+    output = {
+        'count': cnt
+    }
+    return output
+
+def areaCommentListToJson(area_comment_boards):
+    output = {
+        'meta': {
+            'size': len(area_comment_boards)
+        },
+        'list': [{
+            'id': area_comment.id,
+            'content': area_comment.content,
+            'created_at': area_comment.created_at.strftime("%Y.%m.%d %H:%M"),
+            'writer_nickname': area_comment.user.nickname,
+            'reply': [{
+                'id': reply.id,
+                'content': reply.content,
+                'created_at': reply.created_at.strftime("%Y.%m.%d %H:%M"),
+                'writer_nickname': reply.user.nickname,
+            } for reply in area_comment.replys]
+        } for area_comment in area_comment_boards]
+    }
+
+    return output
