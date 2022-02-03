@@ -9,7 +9,7 @@ urlpatterns = [
     path('user/login', views.LoginUser.as_view(), name='userLogin'),    # 로그인
     path('noti/list/<int:paginate>', views.NotiList.as_view()), # 공지 리스트
     path('noti/<int:id>', views.NotiDetail.as_view()),  # 공지글 상세
-    path('area/<area>/<int:paginate>', views.AreaList.as_view()),   # 동네 글 리스트
+    path('area/<area>/<int:paginate>', views.AreaList.as_view()),   # 동네 글 리스트, 
     path('area/upload', views.AreaUpload.as_view()),    # 동네 들 업로드
     path('area/<int:id>', views.AreaDetail.as_view(), name='areaDetail'),   # 동네 글 상세, 삭제
     path('area/<int:board_id>/like', views.AreaLike.as_view()),    # 동네 글 좋아요

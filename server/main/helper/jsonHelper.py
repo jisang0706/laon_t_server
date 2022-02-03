@@ -50,7 +50,7 @@ def areaListToJson(area_boards):
         },
         'list': [{
             'id': area.id,
-            'content': area.content[:15],
+            'content': area.content[:15] + '...' if len(area.content) >= 15 else area.content,
             'created_at': area.created_at.strftime("%Y.%m.%d %H:%M"),
             'like': area.like,
             'comment': area.comment
