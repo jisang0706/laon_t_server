@@ -53,7 +53,8 @@ def areaListToJson(area_boards):
             'content': area.content[:15] + '...' if len(area.content) >= 15 else area.content,
             'created_at': area.created_at.strftime("%Y.%m.%d %H:%M"),
             'like': area.like,
-            'comment': area.comment
+            'comment': area.comment,
+            'writer_nickname': area.writer_nickname
         } for area in area_boards]
     }
     return output
@@ -64,7 +65,8 @@ def areaToJson(area_board):
         'created_at' : area_board.created_at.strftime("%Y.%m.%d %H:%M"),
         'content' : area_board.content,
         'like' : area_board.like,
-        'comment' : area_board.comment
+        'comment' : area_board.comment,
+        'writer_nickname' : area_board.writer_nickname
     }
 
     try:
@@ -82,7 +84,8 @@ def areaUploadToJson(area_board):
             'created_at': '0',
             'content': '',
             'like': 0,
-            'comment': 0
+            'comment': 0,
+            'writer_nickname': ''
         }
     else:
         output = {
@@ -91,7 +94,8 @@ def areaUploadToJson(area_board):
             'created_at' : area_board.created_at.strftime("%Y.%m.%d %H:%M"),
             'content' : area_board.content,
             'like' : area_board.like,
-            'comment' : area_board.comment
+            'comment' : area_board.comment,
+            'writer_nickname': area_board.writer_nickname
         }
     return output
 

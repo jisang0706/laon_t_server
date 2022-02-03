@@ -77,15 +77,13 @@ class AreaList(ListView):
     def get_queryset(self, area, paginate, base):
         if base == '0':
             areaBoards = AreaBoard.objects.filter(area_full_name=area).order_by('-created_at')[paginate*20:paginate*20+20]
-            for i in range(len(areaBoards)):
-                areaBoards[i].like = len(AreaBoardLike.objects.filter(area_board_id=areaBoards[i].id))
-                areaBoards[i].comment = len(AreaComment.objects.filter(area_board_id=areaBoards[i].id))
-            return areaBoards
+        else:
+            areaBoards = AreaBoard.objects.filter(area_full_name=area).order_by('-created_at')[0:2]
 
-        areaBoards = AreaBoard.objects.filter(area_full_name=area).order_by('-created_at')[0:2]
         for i in range(len(areaBoards)):
             areaBoards[i].like = len(AreaBoardLike.objects.filter(area_board_id=areaBoards[i].id))
             areaBoards[i].comment = len(AreaComment.objects.filter(area_board_id=areaBoards[i].id))
+            areaBoards[i].writer_nickname = User.objects.get(id=areaBoards[i].user_id).nickname
         return areaBoards
 
     def get(self, request, area, paginate):
@@ -104,6 +102,7 @@ class AreaDetail(DetailView):
         area_board = AreaBoard.objects.get(id=id)
         area_board.like = len(AreaBoardLike.objects.filter(area_board_id=area_board.id))
         area_board.comment = len(AreaComment.objects.filter(area_board_id=area_board.id))
+        area_board.writer_nickname = User.objects.get(id=area_board.user_id).nickname
         area_board.images = AreaBoardImage.objects.filter(area_board_id=id).order_by('order')
         return area_board
 
@@ -132,6 +131,7 @@ class AreaUpload(View):
                                                  content=data['content'])
             areaBoard.like = 0
             areaBoard.comment = 0
+            areaBoard.writer_nickname = User.objects.get(google_token=data['google_token']).nickname
         except:
             areaBoard = False
 
