@@ -146,7 +146,7 @@ class AreaLike(View):
                                 user_id=User.objects.get(google_token=data['google_token']).id)
 
         return jsonHelper.returnJson(jsonHelper.countToJson(
-            len(AreaBoardLike.objects.filter(area_board_id=data['board_id']))))
+            len(AreaBoardLike.objects.filter(area_board_id=board_id))))
 
 class AreaCommentList(ListView):
     def get_queryset(self, board_id, paginate):
