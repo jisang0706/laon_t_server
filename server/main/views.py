@@ -123,7 +123,6 @@ class AreaDetail(DetailView):
 class AreaUpload(View):
     def post(self, request):
         data = request.POST
-        request.DELETE
         try:
             areaBoard = AreaBoard.objects.create(user_id=User.objects.get(google_token=data['google_token']).id,
                                                  area_full_name=data['area_full_name'],
