@@ -79,23 +79,11 @@ def areaToJson(area_board):
 def areaUploadToJson(area_board):
     if area_board == False:
         output = {
-            'action': 0,
-            'id': 0,
-            'created_at': '0',
-            'content': '',
-            'like': 0,
-            'comment': 0,
-            'writer_nickname': ''
+            'id': 0
         }
     else:
         output = {
-            'action': 1,
-            'id' : area_board.id,
-            'created_at' : area_board.created_at.strftime("%Y.%m.%d %H:%M"),
-            'content' : area_board.content,
-            'like' : area_board.like,
-            'comment' : area_board.comment,
-            'writer_nickname': area_board.writer_nickname
+            'id' : area_board.id
         }
     return output
 
