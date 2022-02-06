@@ -83,7 +83,10 @@ class AreaList(ListView):
         for i in range(len(areaBoards)):
             areaBoards[i].like = len(AreaBoardLike.objects.filter(area_board_id=areaBoards[i].id))
             areaBoards[i].comment = len(AreaComment.objects.filter(area_board_id=areaBoards[i].id))
-            areaBoards[i].writer_nickname = User.objects.get(id=areaBoards[i].user_id).nickname
+            try:
+                areaBoards[i].writer_nickname = User.objects.get(id=areaBoards[i].user_id).nickname
+            except:
+                areaBoards[i].writer_nickname = ""
         return areaBoards
 
     def get(self, request, area, paginate):
@@ -169,8 +172,13 @@ class AreaCommentView(View):
                                                  area_board_id=id,
                                                  comment_group_id=data['group_id'] if 'group_id' in data else 0,
                                                  content=data['content'])
+        if (int(areaComment.comment_group_id) != 0):
+            print(areaComment.comment_group_id)
+            areaComment = AreaComment.objects.get(id=areaComment.comment_group_id)
         areaComment.user = User.objects.get(id=areaComment.user_id)
-        areaComment.replys = []
+        areaComment.replys = list(AreaComment.objects.filter(comment_group_id=areaComment.id))
+        for i in range(len(areaComment.replys)):
+            areaComment.replys[i].user = User.objects.get(id=areaComment.replys[i].user_id)
 
         return jsonHelper.returnJson(jsonHelper.areaCommentListToJson([areaComment]))
 
