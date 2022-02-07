@@ -93,7 +93,7 @@ class AreaList(ListView):
     def get(self, request, area, paginate):
         if 'base' in request.GET and request.GET['base'] == '1':
             return jsonHelper.returnJson(jsonHelper.boardListToJson(
-                self.get_queryset(area, 0, request.GET and request.GET['base'])
+                self.get_queryset(area, 0, '1')
             ))
 
         return jsonHelper.returnJson(jsonHelper.boardListToJson(
@@ -211,7 +211,7 @@ class PGList(ListView):
     def get(self, request, pg_id, paginate):
         if 'base' in request.GET and request.GET['base'] == '1':
             return jsonHelper.returnJson(jsonHelper.boardListToJson(
-                self.get_queryset(pg_id, 0, request.GET and request.get['base'])
+                self.get_queryset(pg_id, 0, '1')
             ))
 
         return jsonHelper.returnJson(jsonHelper.boardListToJson(
