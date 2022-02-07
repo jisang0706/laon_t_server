@@ -193,11 +193,11 @@ class AreaCommentView(View):
             return jsonHelper.returnJson(jsonHelper.actionToJson(0))
 
 class PGList(ListView):
-    def get_queryset(self, pg_id, paginate, base):
+    def get_queryset(self, pg_name, paginate, base):
         if base == '0':
-            pgBoards = PlaygroundBoard.objects.filter(playground_id=pg_id).order_by('-created_at')[paginate*20:paginate*20+20]
+            pgBoards = PlaygroundBoard.objects.filter(playground_name=pg_name).order_by('-created_at')[paginate*20:paginate*20+20]
         else:
-            pgBoards = list(PlaygroundBoard.objects.filter(playground_id=pg_id).latest('id'))
+            pgBoards = list(PlaygroundBoard.objects.filter(playground_name=pg_name).latest('id'))
 
         for i in range(len(pgBoards)):
             pgBoards[i].like = len(PlaygroundBoardLike.objects.filter(playground_board_id=pgBoards[i].id))
@@ -208,14 +208,14 @@ class PGList(ListView):
                 pgBoards[i].writer_nickname = ""
         return pgBoards
 
-    def get(self, request, pg_id, paginate):
+    def get(self, request, pg_name, paginate):
         if 'base' in request.GET and request.GET['base'] == '1':
             return jsonHelper.returnJson(jsonHelper.boardListToJson(
-                self.get_queryset(pg_id, 0, '1')
+                self.get_queryset(pg_name, 0, '1')
             ))
 
         return jsonHelper.returnJson(jsonHelper.boardListToJson(
-            self.get_queryset(pg_id, paginate, '0')
+            self.get_queryset(pg_name, paginate, '0')
         ))
 
 class PGDetail(DetailView):
@@ -246,7 +246,6 @@ class PGUpload(View):
         data = request.POST
         try:
             pgBoard = PlaygroundBoard.objects.create(user_id=User.objects.get(google_token=data['google_token']).id,
-                                                     playground_id=data['playground_id'],
                                                      playground_name=data['playground_name'],
                                                      content=data['content'])
             pgBoard.like = 0

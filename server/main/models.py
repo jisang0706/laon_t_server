@@ -29,8 +29,7 @@ class NotiBoardImage(models.Model):
 
 class PlaygroundBoard(models.Model):
     user_id = models.IntegerField()
-    playground_id = models.CharField(max_length=10)
-    playground_name = models.CharField(max_length=50)
+    playground_name = models.TextField()
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
