@@ -43,47 +43,47 @@ def notiToJson(noti_board):
 
     return output
 
-def areaListToJson(area_boards):
+def boardListToJson(boards):
     output = {
         'meta': {
-            'size': len(area_boards)
+            'size': len(boards)
         },
         'list': [{
-            'id': area.id,
-            'content': area.content[:15] + '...' if len(area.content) >= 15 else area.content,
-            'created_at': area.created_at.strftime("%Y.%m.%d %H:%M"),
-            'like': area.like,
-            'comment': area.comment,
-            'writer_nickname': area.writer_nickname
-        } for area in area_boards]
+            'id': board.id,
+            'content': board.content[:15] + '...' if len(board.content) >= 15 else board.content,
+            'created_at': board.created_at.strftime("%Y.%m.%d %H:%M"),
+            'like': board.like,
+            'comment': board.comment,
+            'writer_nickname': board.writer_nickname
+        } for board in boards]
     }
     return output
 
-def areaToJson(area_board):
+def boardToJson(boards):
     output = {
-        'id' : area_board.id,
-        'created_at' : area_board.created_at.strftime("%Y.%m.%d %H:%M"),
-        'content' : area_board.content,
-        'like' : area_board.like,
-        'comment' : area_board.comment,
-        'writer_nickname' : area_board.writer_nickname
+        'id' : boards.id,
+        'created_at' : boards.created_at.strftime("%Y.%m.%d %H:%M"),
+        'content' : boards.content,
+        'like' : boards.like,
+        'comment' : boards.comment,
+        'writer_nickname' : boards.writer_nickname
     }
 
     try:
-        output['images'] = [img.img_link for img in area_board.images]
+        output['images'] = [img.img_link for img in boards.images]
     except:
         output['images'] = []
 
     return output
 
-def areaUploadToJson(area_board):
-    if area_board == False:
+def boardUploadToJson(boards):
+    if boards == False:
         output = {
             'id': 0
         }
     else:
         output = {
-            'id' : area_board.id
+            'id' : boards.id
         }
     return output
 
@@ -93,23 +93,23 @@ def countToJson(cnt):
     }
     return output
 
-def areaCommentListToJson(area_comment_boards):
+def commentListToJson(comment_boards):
     output = {
         'meta': {
-            'size': len(area_comment_boards)
+            'size': len(comment_boards)
         },
         'list': [{
-            'id': area_comment.id,
-            'content': area_comment.content,
-            'created_at': area_comment.created_at.strftime("%Y.%m.%d %H:%M"),
-            'writer_nickname': area_comment.user.nickname,
+            'id': comment.id,
+            'content': comment.content,
+            'created_at': comment.created_at.strftime("%Y.%m.%d %H:%M"),
+            'writer_nickname': comment.user.nickname,
             'reply': [{
                 'id': reply.id,
                 'content': reply.content,
                 'created_at': reply.created_at.strftime("%Y.%m.%d %H:%M"),
                 'writer_nickname': reply.user.nickname,
-            } for reply in area_comment.replys]
-        } for area_comment in area_comment_boards]
+            } for reply in comment.replys]
+        } for comment in comment_boards]
     }
 
     return output

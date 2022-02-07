@@ -4,7 +4,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import CreateView, View, ListView, DetailView, DeleteView
-from .models import User, NotiBoard, NotiBoardImage, AreaBoard, AreaBoardLike, AreaComment, AreaBoardImage
+from .models import User, NotiBoard, NotiBoardImage, AreaBoard, AreaBoardLike, AreaComment, AreaBoardImage, \
+    PlaygroundBoard, PlaygroundBoardLike, PlaygroundComment, PlaygroundBoardImage
 from .helper import jsonHelper
 
 SUCCESS_URL = "/action?act=1"
@@ -91,11 +92,11 @@ class AreaList(ListView):
 
     def get(self, request, area, paginate):
         if 'base' in request.GET and request.GET['base'] == '1':
-            return jsonHelper.returnJson(jsonHelper.areaListToJson(
+            return jsonHelper.returnJson(jsonHelper.boardListToJson(
                 self.get_queryset(area, 0, request.GET and request.GET['base'])
             ))
 
-        return jsonHelper.returnJson(jsonHelper.areaListToJson(
+        return jsonHelper.returnJson(jsonHelper.boardListToJson(
             self.get_queryset(area, paginate, '0')
         ))
 
@@ -110,7 +111,7 @@ class AreaDetail(DetailView):
         return area_board
 
     def get(self, request, id):
-        return jsonHelper.returnJson(jsonHelper.areaToJson(
+        return jsonHelper.returnJson(jsonHelper.boardToJson(
             self.get_queryset(id)
         ))
 
@@ -118,6 +119,7 @@ class AreaDetail(DetailView):
         if User.objects.get(google_token=request.headers.get("GOOGLETOKEN")).id == AreaBoard.objects.get(id=id).user_id:
             AreaBoard.objects.get(id=id).delete()
             AreaComment.objects.filter(area_board_id=id).delete()
+            AreaBoardLike.objects.filter(area_board_id=id).delete()
             return jsonHelper.returnJson(jsonHelper.actionToJson(1))
         else:
             return jsonHelper.returnJson(jsonHelper.actionToJson(0))
@@ -137,7 +139,7 @@ class AreaUpload(View):
         except:
             areaBoard = False
 
-        return jsonHelper.returnJson(jsonHelper.areaUploadToJson(
+        return jsonHelper.returnJson(jsonHelper.boardUploadToJson(
             areaBoard
         ))
 
@@ -161,7 +163,7 @@ class AreaCommentList(ListView):
         return areaCommentBoards
 
     def get(self, request, board_id, paginate):
-        return jsonHelper.returnJson(jsonHelper.areaCommentListToJson(
+        return jsonHelper.returnJson(jsonHelper.commentListToJson(
             self.get_queryset(board_id, paginate)
         ))
 
@@ -180,7 +182,7 @@ class AreaCommentView(View):
         for i in range(len(areaComment.replys)):
             areaComment.replys[i].user = User.objects.get(id=areaComment.replys[i].user_id)
 
-        return jsonHelper.returnJson(jsonHelper.areaCommentListToJson([areaComment]))
+        return jsonHelper.returnJson(jsonHelper.commentListToJson([areaComment]))
 
     def delete(self, request, id):
         if User.objects.get(google_token=request.headers.get('GOOGLETOKEN')).id == AreaComment.objects.get(id=id).user_id:
@@ -189,3 +191,118 @@ class AreaCommentView(View):
             return jsonHelper.returnJson(jsonHelper.actionToJson(1))
         else:
             return jsonHelper.returnJson(jsonHelper.actionToJson(0))
+
+class PGList(ListView):
+    def get_queryset(self, pg_id, paginate, base):
+        if base == '0':
+            pgBoards = PlaygroundBoard.objects.filter(playground_id=pg_id).order_by('-created_at')[paginate*20:paginate*20+20]
+        else:
+            pgBoards = list(PlaygroundBoard.objects.filter(playground_id=pg_id).latest('id'))
+
+        for i in range(len(pgBoards)):
+            pgBoards[i].like = len(PlaygroundBoardLike.objects.filter(playground_board_id=pgBoards[i].id))
+            pgBoards[i].comment = len(PlaygroundComment.objects.filter(playground_board_id=pgBoards[i].id))
+            try:
+                pgBoards[i].writer_nickname = User.objects.get(id=pgBoards[i].user_id).nickname
+            except:
+                pgBoards[i].writer_nickname = ""
+        return pgBoards
+
+    def get(self, request, pg_id, paginate):
+        if 'base' in request.GET and request.GET['base'] == '1':
+            return jsonHelper.returnJson(jsonHelper.boardListToJson(
+                self.get_queryset(pg_id, 0, request.GET and request.get['base'])
+            ))
+
+        return jsonHelper.returnJson(jsonHelper.boardListToJson(
+            self.get_queryset(pg_id, paginate, '0')
+        ))
+
+class PGDetail(DetailView):
+    def get_queryset(self, id):
+        pg_board = PlaygroundBoard.objects.get(id=id)
+        pg_board.like = len(PlaygroundBoardLike.objects.filter(playground_board_id=pg_board.id))
+        pg_board.comment = len(PlaygroundComment.objects.filter(playground_board_id=pg_board.id))
+        pg_board.writer_nickname = User.objects.get(id=pg_board.user_id).nickname
+        pg_board.images = PlaygroundBoardImage.objects.filter(playground_board_id=pg_board.id).order_by('order')
+        return pg_board
+
+    def get(self, request, id):
+        return jsonHelper.returnJson(jsonHelper.boardToJson(
+            self.get_queryset(id)
+        ))
+
+    def delete(self, request, id):
+        if User.objects.get(google_token=request.headers.get('GOOGLETOKEN')).id == PlaygroundBoard.objects.get(id=id).user_id:
+            PlaygroundBoard.objects.get(id=id).delete()
+            PlaygroundComment.objects.filter(playground_board_id=id).delete()
+            PlaygroundBoardLike.objects.filter(playground_board_id=id).delete()
+            return jsonHelper.returnJson(jsonHelper.actionToJson(1))
+        else:
+            return jsonHelper.returnJson(jsonHelper.actionToJson(0))
+
+class PGUpload(View):
+    def post(self, request):
+        data = request.POST
+        try:
+            pgBoard = PlaygroundBoard.objects.create(user_id=User.objects.get(google_token=data['google_token']).id,
+                                                     playground_id=data['playground_id'],
+                                                     playground_name=data['playground_name'],
+                                                     content=data['content'])
+            pgBoard.like = 0
+            pgBoard.comment = 0
+            pgBoard.writer_nickname = User.objects.get(google_token=data['google_token']).nickname
+        except:
+            pgBoard = False
+
+        return jsonHelper.returnJson(jsonHelper.boardUploadToJson(
+            pgBoard
+        ))
+
+class PGLike(View):
+    def post(self, request, board_id):
+        data = request.POST
+        PlaygroundBoardLike.objects.get_or_create(playground_board_id=board_id,
+                                                  user_id=User.objects.get(google_token=data['google_token']).id)
+
+        return jsonHelper.returnJson(jsonHelper.countToJson(
+            len(PlaygroundBoardLike.objects.filter(playground_board_id=board_id))
+        ))
+
+class PGCommentList(ListView):
+    def get_queryset(self, board_id, paginate):
+        pgCommentBoards = PlaygroundComment.objects.filter(playground_board_id=board_id, comment_group_id=0).order_by('created_at')[paginate*20:paginate*20+20]
+        for i in range(len(pgCommentBoards)):
+            pgCommentBoards[i].replys = PlaygroundComment.objects.filter(comment_group_id=pgCommentBoards[i].id)
+            pgCommentBoards[i].user = User.objects.get(id=pgCommentBoards[i].user_id)
+            for j in range(len(pgCommentBoards[i].replys)):
+                pgCommentBoards[i].replys[j].user = User.objects.get(id=pgCommentBoards[i].replys[j].user_id)
+        return pgCommentBoards
+
+    def get(self, request, board_id, paginate):
+        return jsonHelper.returnJson(jsonHelper.commentListToJson(
+            self.get_queryset(board_id, paginate)
+        ))
+
+class PGCommentView(View):
+    def post(self, request, id):
+        data = request.POST
+        pgComment = PlaygroundComment.objects.create(user_id=User.objects.get(google_token=data['google_token']).id,
+                                                     playground_board_id=id,
+                                                     comment_group_id=data['group_id'] if 'group_id' in data else 0,
+                                                     content=data['content'])
+        if (int(pgComment.comment_group_id) != 0):
+            pgComment = PlaygroundComment.objects.get(id=pgComment.comment_group_id)
+        pgComment.user = User.objects.get(id=pgComment.user_id)
+        pgComment.replys = list(PlaygroundComment.objects.filter(comment_group_id=pgComment.id))
+        for i in range(len(pgComment.replys)):
+            pgComment.replys[i].user = User.objects.get(id=pgComment.replys[i].user_id)
+
+        return jsonHelper.returnJson(jsonHelper.commentListToJson([pgComment]))
+
+    def delete(self, request, id):
+        if User.objects.get(google_token=request.headers.get('GOOGLETOKEN')).id == PlaygroundComment.objects.get(id=id).user_id:
+            PlaygroundComment.objects.get(id=id).delete()
+            PlaygroundComment.objects.filter(comment_group_id=id).delete()
+            return jsonHelper.returnJson(jsonHelper.actionToJson(1))
+        return jsonHelper.returnJson(jsonHelper.actionToJson(0))
