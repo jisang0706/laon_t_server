@@ -197,7 +197,7 @@ class PGList(ListView):
         if base == '0':
             pgBoards = PlaygroundBoard.objects.filter(playground_name=pg_name).order_by('-created_at')[paginate*20:paginate*20+20]
         else:
-            pgBoards = list(PlaygroundBoard.objects.filter(playground_name=pg_name).latest('id'))
+            pgBoards = [PlaygroundBoard.objects.filter(playground_name=pg_name).latest('id')]
 
         for i in range(len(pgBoards)):
             pgBoards[i].like = len(PlaygroundBoardLike.objects.filter(playground_board_id=pgBoards[i].id))
