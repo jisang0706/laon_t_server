@@ -18,9 +18,9 @@ urlpatterns = [
     path('area/<int:board_id>/comment/<int:paginate>', views.AreaCommentList.as_view()),    # 동네 댓글 리스트
     path('area/<int:id>/comment', views.AreaCommentView.as_view()), # 동네 댓글 업로드, 삭제
 
-    path('playground/<pg_id>/<int:paginate>', views.PGList.as_view()),  # 놀이터 글 리스트
-    path('playground/<int:id>', views.PGDetail.as_view(), name='pgDetail'), # 놀이터 글 업로드
-    path('playground/upload', views.PGUpload.as_view()),    # 놀이터 글 상세, 삭제
+    path('playground/<pg_name>/<int:paginate>', views.PGList.as_view()),  # 놀이터 글 리스트
+    path('playground/upload', views.PGDetail.as_view(), name='pgDetail'), # 놀이터 글 업로드
+    path('playground/<int:id>', views.PGUpload.as_view()),    # 놀이터 글 상세, 삭제
     path('playground/<int:board_id>/like', views.PGLike.as_view()), # 놀이터 글 좋아요
     path('playground/<int:board_id>/comment/<int:paginate>', views.PGCommentList.as_view()),    # 놀이터 댓글 리스트
     path('playground/<int:id>/comment', views.PGCommentView.as_view()),
