@@ -195,7 +195,7 @@ class AreaCommentView(View):
 class PGList(ListView):
     def get_queryset(self, pg_name, paginate, base):
         if base == '0':
-            pgBoards = PlaygroundBoard.objects.filter(playground_name=pg_name).order_by('-created_at')[paginate*20:paginate*20+20]
+            pgBoards = PlaygroundBoard.objects.filter(playground_name=pg_name)[paginate*20:paginate*20+20]
         else:
             pgBoards = [PlaygroundBoard.objects.filter(playground_name=pg_name).latest('id')]
 
