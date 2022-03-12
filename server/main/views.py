@@ -1,5 +1,6 @@
 from django.core import serializers
 from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -75,9 +76,13 @@ class NotiCreate(CreateView):
     fields = ['']
 
 class AreaList(ListView):
-    def get_queryset(self, area, paginate, base):
+    def get_queryset(self, area, paginate, base, search):
         if base == '0':
             areaBoards = AreaBoard.objects.filter(area_full_name=area).order_by('-created_at')[paginate*20:paginate*20+20]
+        elif base == '2':
+            areaBoards = AreaBoard.objects.filter(
+                Q(area_full_name=area) & Q(content__icontains=search)
+            ).order_by('-created_at')[paginate*20:paginate*20+20]
         else:
             areaBoards = AreaBoard.objects.filter(area_full_name=area).order_by('-created_at')[0:2]
 
@@ -93,11 +98,16 @@ class AreaList(ListView):
     def get(self, request, area, paginate):
         if 'base' in request.GET and request.GET['base'] == '1':
             return jsonHelper.returnJson(jsonHelper.boardListToJson(
-                self.get_queryset(area, 0, '1')
+                self.get_queryset(area, 0, '1', '')
+            ))
+
+        if 'search' in request.GET:
+            return jsonHelper.returnJson(jsonHelper.boardListToJson(
+                self.get_queryset(area, paginate, '2', request.GET['search'])
             ))
 
         return jsonHelper.returnJson(jsonHelper.boardListToJson(
-            self.get_queryset(area, paginate, '0')
+            self.get_queryset(area, paginate, '0', '')
         ))
 
 class AreaDetail(DetailView):
@@ -193,9 +203,13 @@ class AreaCommentView(View):
             return jsonHelper.returnJson(jsonHelper.actionToJson(0))
 
 class PGList(ListView):
-    def get_queryset(self, pg_name, paginate, base):
+    def get_queryset(self, pg_name, paginate, base, search):
         if base == '0':
             pgBoards = PlaygroundBoard.objects.filter(playground_name=pg_name).order_by('-created_at')[paginate*20:paginate*20+20]
+        elif base == '2':
+            pgBoards = PlaygroundBoard.objects.filter(
+                Q(playground_name=pg_name) & Q(content__icontains=search)
+            ).order_by('-created_at')[paginate*20:paginate*20+20]
         else:
             pgBoards = [PlaygroundBoard.objects.filter(playground_name=pg_name).latest('id')]
 
@@ -211,11 +225,16 @@ class PGList(ListView):
     def get(self, request, pg_name, paginate):
         if 'base' in request.GET and request.GET['base'] == '1':
             return jsonHelper.returnJson(jsonHelper.boardListToJson(
-                self.get_queryset(pg_name, 0, '1')
+                self.get_queryset(pg_name, 0, '1', '')
+            ))
+
+        if 'search' in request.GET:
+            return jsonHelper.returnJson(jsonHelper.boardListToJson(
+                self.get_queryset(pg_name, paginate, '2', request.GET['search'])
             ))
 
         return jsonHelper.returnJson(jsonHelper.boardListToJson(
-            self.get_queryset(pg_name, paginate, '0')
+            self.get_queryset(pg_name, paginate, '0', '')
         ))
 
 class PGDetail(DetailView):
