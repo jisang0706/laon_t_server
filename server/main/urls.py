@@ -7,6 +7,7 @@ urlpatterns = [
     path('action', views.Action.as_view()),
     path('user/join', views.JoinUser.as_view()),    # 회원가입
     path('user/login', views.LoginUser.as_view(), name='userLogin'),    # 로그인
+    path('user/nickname', views.setNickname.as_view()), # 닉네임 변경
 
     path('noti/list/<int:paginate>', views.NotiList.as_view()), # 공지 리스트
     path('noti/<int:id>', views.NotiDetail.as_view()),  # 공지글 상세

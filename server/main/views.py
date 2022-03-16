@@ -20,16 +20,14 @@ class Action(View):
     def get(self, request):
         return jsonHelper.returnJson(jsonHelper.actionToJson(request.GET['act']))
 
-class JoinUser(CreateView):
-    model = User
-    fields = ['google_token', 'nickname', 'email']
+class JoinUser(View):
 
-    def get_success_url(self):
-        try:
-            User.objects.get(google_token=self.object.google_token)
-            return SUCCESS_URL
-        except:
-            return FAIL_URL
+    def post(self, request):
+        data = request.POST
+        if len(User.objects.filter(nickname=data['nickname'])) > 0:
+            return jsonHelper.returnJson(jsonHelper.actionToJson(0))
+        User.objects.create(google_token=data['google_token'], nickname=data['nickname'], email=data['email'])
+        return jsonHelper.returnJson(jsonHelper.actionToJson(1))
 
     def form_invalid(self, form): # 사용자 가입 실패할 경우 실패 페이지 호출
         return HttpResponseRedirect(FAIL_URL)
@@ -43,6 +41,17 @@ class LoginUser(View):
             return jsonHelper.returnJson(jsonHelper.userInfoToJson(1, user.nickname))
         except:
             return jsonHelper.returnJson(jsonHelper.userInfoToJson(0, ""))
+
+class setNickname(View):
+    def post(self, request):
+        new_nickname = request.POST.get('nickname')
+        if (len(User.objects.filter(nickname=new_nickname)) > 0):
+            return jsonHelper.returnJson(jsonHelper.actionToJson(0))
+
+        user = User.objects.get(google_token=request.headers.get('GOOGLETOKEN'))
+        user.nickname = new_nickname
+        user.save()
+        return jsonHelper.returnJson(jsonHelper.actionToJson(1))
 
 class NotiList(ListView):
 
