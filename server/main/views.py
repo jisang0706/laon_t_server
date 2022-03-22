@@ -333,3 +333,93 @@ class PGCommentView(View):
             PlaygroundComment.objects.filter(comment_group_id=id).delete()
             return jsonHelper.returnJson(jsonHelper.actionToJson(1))
         return jsonHelper.returnJson(jsonHelper.actionToJson(0))
+
+class AreaWritedList(ListView):
+    def get_queryset(self, paginate, user_id):
+        areaBoards = AreaBoard.objects.filter(user_id=user_id).order_by('-created_at')[paginate*20:paginate*20+20]
+
+        for i in range(len(areaBoards)):
+            areaBoards[i].like = len(AreaBoardLike.objects.filter(area_board_id=areaBoards[i].id))
+            areaBoards[i].comment = len(AreaComment.objects.filter(area_board_id=areaBoards[i].id))
+            try:
+                areaBoards[i].writer_nickname = User.objects.get(id=areaBoards[i].user_id).nickname
+            except:
+                areaBoards[i].writer_nickname = ""
+        return areaBoards
+
+    def get(self, request, paginate):
+        user_id = User.objects.get(google_token=request.headers.get("GOOGLETOKEN")).id
+        return jsonHelper.returnJson(jsonHelper.boardListToJson(
+            self.get_queryset(paginate, user_id)
+        ))
+
+class AreaCommentWritedList(ListView):
+    def get_queryset(self, paginate, user_id):
+        areaBoardIds = set(AreaComment.objects.filter(user_id=user_id).values_list('area_board_id', flat=True))
+        areaBoards = []
+        for areaBoardId in areaBoardIds:
+            try:
+                areaBoards.append(AreaBoard.objects.get(id=areaBoardId))
+            except:
+                pass
+        areaBoards.sort(key=lambda areaBoard: areaBoard.created_at, reverse=True)
+        areaBoards = areaBoards[paginate*20:paginate*20+20]
+        for i in range(len(areaBoards)):
+            areaBoards[i].like = len(AreaBoardLike.objects.filter(area_board_id=areaBoards[i].id))
+            areaBoards[i].comment = len(AreaComment.objects.filter(area_board_id=areaBoards[i].id))
+            try:
+                areaBoards[i].writer_nickname = User.objects.get(id=areaBoards[i].user_id).nickname
+            except:
+                areaBoards[i].writer_nickname = ""
+        return areaBoards
+
+    def get(self, request, paginate):
+        user_id = User.objects.get(google_token=request.headers.get("GOOGLETOKEN")).id
+        return jsonHelper.returnJson(jsonHelper.boardListToJson(
+            self.get_queryset(paginate, user_id)
+        ))
+
+class PGWritedList(ListView):
+    def get_queryset(self, paginate, user_id):
+        pgBoards = PlaygroundBoard.objects.filter(user_id=user_id).order_by('-created_at')[paginate*20:paginate*20+20]
+
+        for i in range(len(pgBoards)):
+            pgBoards[i].like = len(PlaygroundBoardLike.objects.filter(playground_board_id=pgBoards[i].id))
+            pgBoards[i].comment = len(PlaygroundComment.objects.filter(playground_board_id=pgBoards[i].id))
+            try:
+                pgBoards[i].writer_nickname = User.objects.get(id=pgBoards[i].user_id).nickname
+            except:
+                pgBoards[i].writer_nickname = ""
+        return pgBoards
+
+    def get(self, request, paginate):
+        user_id = User.objects.get(google_token=request.headers.get("GOOGLETOKEN")).id
+        return jsonHelper.returnJson(jsonHelper.boardListToJson(
+            self.get_queryset(paginate, user_id)
+        ))
+
+class PGCommentWritedList(ListView):
+    def get_queryset(self, paginate, user_id):
+        pgBoardIds = set(PlaygroundComment.objects.filter(user_id=user_id).values_list('playground_board_id', flat=True))
+        pgBoards = []
+        for pgBoardId in pgBoardIds:
+            try:
+                pgBoards.append(PlaygroundBoard.objects.get(id=pgBoardId))
+            except:
+                pass
+        pgBoards.sort(key=lambda pgBoard: pgBoard.created_at, reverse=True)
+        pgBoards = pgBoards[paginate*20:paginate*20+20]
+        for i in range(len(pgBoards)):
+            pgBoards[i].like = len(PlaygroundBoardLike.objects.filter(playground_board_id=pgBoards[i].id))
+            pgBoards[i].comment = len(PlaygroundComment.objects.filter(playground_board_id=pgBoards[i].id))
+            try:
+                pgBoards[i].writer_nickname = User.objects.get(id=pgBoards[i].user_id).nickname
+            except:
+                pgBoards[i].writer_nickname = ""
+        return pgBoards
+
+    def get(self, request, paginate):
+        user_id = User.objects.get(google_token=request.headers.get("GOOGLETOKEN")).id
+        return jsonHelper.returnJson(jsonHelper.boardListToJson(
+            self.get_queryset(paginate, user_id)
+        ))
