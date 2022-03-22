@@ -423,3 +423,15 @@ class PGCommentWritedList(ListView):
         return jsonHelper.returnJson(jsonHelper.boardListToJson(
             self.get_queryset(paginate, user_id)
         ))
+
+class AreaBoardName(View):
+    def get(self, request, id):
+        return jsonHelper.returnJson(jsonHelper.actionToJson(
+            AreaBoard.objects.get(id=id).area_end_name
+        ))
+
+class PGBoardName(View):
+    def get(self, request, id):
+        return jsonHelper.returnJson(jsonHelper.actionToJson(
+            PlaygroundBoard.objects.get(id=id).playground_name
+        ))
